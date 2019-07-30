@@ -1,0 +1,18 @@
+Using Dijkstra’s algorithm, algorithm for the shortest path in a tree, implement a traffic simulation.  
+Dijkstra’s algorithm specifically finds the solution where all edge-weights are non-negative on a weighted directed graph.  
+“The first two integers are the number of vertices and edges that must be followed by pairs of vertices having an edge between them.”  
+The edges of the tree are the traffic links, roads between intersections, and the nodes of the tree are the intersections.  
+The goal of this project is to implement a traffic simulation where the most efficient (shortest) path is calculated, potentially over different graphs (sequences of roads).  
+In the implementation of this project we will likely use openmp and potentially MPI if we can get further speed ups out of using master-worker for node load balancing.  
+One potential issue with using the traffic links as edges and intersections as nodes is being unable to get a uni-directional graph where upon approaching an intersection where turns depend on where the previous point was.  
+This is in comparison to a traditional graph where any edge can be taken from a node.  
+This problem can be resolved by “representing a link-intersection pair”.  
+It would be necessary to traverse a link to get any subsequent link-intersection pair (point of choice), an edge would be defined as this traversal this results in a typical graph.  
+
+Works Cited
+“Dijkstra's Algorithm in C.” Code with C, 20 May 2015, www.codewithc.com/dijkstras-
+algorithm-in-c/.
+Kramida, Greg. “Is There Any Better Approach to Shortest Path Finding within a (Vehicular) 
+Traffic Network?” Software Engineering Stack Exchange, 
+softwareengineering.stackexchange.com/questions/161914/is-there-any-better-approach-
+to-shortest-path-finding-within-a-vehicular-traff.
