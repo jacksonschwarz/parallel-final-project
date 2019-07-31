@@ -1,54 +1,38 @@
- ****************************** PSEUDOCODE ******************************
- function Dijkstra(Graph, source):
-       dist[source]  := 0                     // Distance from source to source
-       for each vertex v in Graph:            // Initializations
-           if v ≠ source
-               dist[v]  := infinity           // Unknown distance function from source to v
-               previous[v]  := undefined      // Previous node in optimal path from source
-           end if 
-           add v to Q                         // All nodes initially in Q
-       end for
-      
-      while Q is not empty:                  // The main loop
-          u := vertex in Q with min dist[u]  // Source node in first case
-          remove u from Q 
-          
-          for each neighbor v of u:           // where v has not yet been removed from Q.
-              alt := dist[u] + length(u, v)
-              if alt < dist[v]:               // A shorter path to v has been found
-                  dist[v]  := alt 
-                  previous[v]  := u 
-              end if
-          end for
-      end while
-      return dist[], previous[]
-  end function
- 
-*****************************  C CODE  *****************************
-  
-  /* Dijkstra's Algorithm in C */
+/* Dijkstra's Algorithm in C */
 #include<stdio.h>
-#include<conio.h>
-#include<process.h>
 #include<string.h>
 #include<math.h>
-#define IN 99
+
+#define INF 99
 #define N 6
 int dijkstra(int cost[][N], int source, int target);
-int main()
-{
-    int cost[N][N],i,j,w,ch,co;
-    int source, target,x,y;
-    printf("\t The Shortest Path Algorithm ( DIJKSTRA'S ALGORITHM in C \n\n");
-    for(i=1;i< N;i++)
-    for(j=1;j< N;j++)
-    cost[i][j] = IN;
-    for(x=1;x< N;x++)
+int main(){
+    int cost[N][N];
+    int i,j;
+    int w;
+    int ch;
+    int co;
+    int source;
+    int target;
+    int x;
+    int y;
+
+    for(i=1;i< N;i++){
+        for(j=1;j< N;j++){
+            cost[i][j] = INF; //constructs an N by N matrix, setting all costs to INF   
+        }
+        
+    } 
+
+    //put the text file processing here. The "weights" are just areas of the code that are not zero.
+
+    for(x=1;x<N;x++)
     {
         for(y=x+1;y< N;y++)
         {
             printf("Enter the weight of the path between nodes %d and %d: ",x,y);
             scanf("%d",&w);
+            if(w == 0) w = INF;
             cost [x][y] = cost[y][x] = w;
         }
         printf("\n");
@@ -62,46 +46,59 @@ int main()
 }
 int dijsktra(int cost[][N],int source,int target)
 {
-    int dist[N],prev[N],selected[N]={0},i,m,min,start,d,j;
-    char path[N];
+    int dist[N] = {0}; //an array of distances between nodes
+    int prev[N] = {0}; //the previous node's cost.
+    int selected[N]={0}; //if a node is selected, and its adjacent edges are being checked. 
+    int minIndex; //the index of the node with the minimum amount of cost.
+    int min; //the minimum cost between nodes. 
+    int start; //starting point
+    int d; //the distance between nodes
+    int i; //iterator
+    int j; //iterator
+    char path[N]; //a string containing the path of nodes. 1 = A, 2 = B, etc.
+
     for(i=1;i< N;i++)
     {
-        dist[i] = IN;
+        dist[i] = INF; //set all distances to infinite
         prev[i] = -1;
     }
-    start = source;
-    selected[start]=1;
-    dist[start] = 0;
-    while(selected[target] ==0)
+
+    start = source; //the starting location of the code.
+    selected[start]=1; //a boolean value stating that selected[i] is currently being looked it.
+
+    dist[start] = 0; //the beginning distance 
+    while(selected[target] == 0)
     {
-        min = IN;
-        m = 0;
+        min = INF; //set the minimum to infinity at first to guarentee the chance of the minimum occuring
+        minIndex = 0; //the index of the minimum item, set that to be the first element regardless of what it will become
+
         for(i=1;i< N;i++)
         {
-            d = dist[start] +cost[start][i];
-            if(d< dist[i]&&selected[i]==0)
+            d = dist[start] + cost[start][i]; //add the first distance to the current adjacent node to the node with the current minimum index.
+            if(d < dist[i] && selected[i] == 0) //if the distance "d" is less than the current distance, and this node has not yet been selected...
             {
-                dist[i] = d;
-                prev[i] = start;
+                dist[i] = d; //set the current distance to the calculated distance
+                prev[i] = start; //set the previous element to the minimum index. 
             }
-            if(min>dist[i] && selected[i]==0)
+            if(min > dist[i] && selected[i] == 0) //If the minimum is greater than the distance and the node has not yet been selected...
             {
-                min = dist[i];
-                m = i;
+                min = dist[i]; //set the minimum to the current distance.
+                minIndex = i; //set the minimum index to the current index.
             }
         }
-        start = m;
-        selected[start] = 1;
+        start = minIndex; //set the start to the minimum index.
+        selected[start] = 1; //set that particular node to "Selected"
     }
-    start = target;
+    start = target; //in the end, the "Start" variable will just be the target.
+
     j = 0;
     while(start != -1)
     {
-        path[j++] = start+65;
-        start = prev[start];
+        path[j++] = start+64; //take the "start" variable and convert it to an alphabetical character. Then, add it to the path string
+        start = prev[start]; //set the 
     }
+
     path[j]='\0';
-    strrev(path);
     printf("%s", path);
     return dist[target];
 }
