@@ -4,7 +4,7 @@
 #include<math.h>
 
 #define INF 99
-#define N 6
+#define N 5
 int dijkstra(int cost[][N], int source, int target);
 int main(){
     int cost[N][N];
@@ -26,26 +26,65 @@ int main(){
 
     //put the text file processing here. The "weights" are just areas of the code that are not zero.
 
-    for(x=1;x<N;x++)
+    int c;
+    char *input = "matrix.txt";
+    FILE *input_file;
+
+    input_file = fopen(input, "r");
+
+    int rowcount = 0;
+    int colcount = 0;
+    while ((c =fgetc(input_file)) != EOF )
     {
-        for(y=x+1;y< N;y++)
-        {
-            printf("Enter the weight of the path between nodes %d and %d: ",x,y);
-            scanf("%d",&w);
-            if(w == 0) w = INF;
-            cost [x][y] = cost[y][x] = w;
+        if (isdigit(c)){
+            int digit = c-48;
+
+            if(digit  == 0){
+                cost[rowcount][colcount] = cost[rowcount][colcount] = INF;                            
+            }
+            else{
+                cost[rowcount][colcount] = cost[rowcount][colcount] = digit;
+            }
+
+            colcount++;
+        }
+        if(c == 10) {
+            rowcount++;
+            colcount = 0;
+        }
+    }
+
+    for(int i = 0;i<5;i++){
+        for(int j = 0;j<5;j++){
+            printf("%d ", cost[i][j]);
         }
         printf("\n");
     }
-    printf("\nEnter the source:");
+    printf("Finished file reading");
+    fclose(input_file);
+    
+    // for(x=1;x<N;x++)
+    // {
+    //     for(y=x+1;y< N;y++)
+    //     {
+    //         printf("Enter the weight of the path between nodes %d and %d: ",x,y);
+    //         scanf("%d",&w);
+    //         if(w == 0) w = INF;
+    //         cost [x][y] = cost[y][x] = w;
+    //     }
+    //     printf("\n");
+    // }
+    
+
     scanf("%d", &source);
-    printf("\nEnter the target");
+
     scanf("%d", &target);
-    co = dijsktra(cost,source,target);
-    printf("\nThe Shortest Path: %d",co);
+
+    co = dijsktra(cost,source-1,target-1);
 }
 int dijsktra(int cost[][N],int source,int target)
 {
+    printf("Reaches the top of the function");
     int dist[N] = {0}; //an array of distances between nodes
     int prev[N] = {0}; //the previous node's cost.
     int selected[N]={0}; //if a node is selected, and its adjacent edges are being checked. 
@@ -57,10 +96,12 @@ int dijsktra(int cost[][N],int source,int target)
     int j; //iterator
     char path[N]; //a string containing the path of nodes. 1 = A, 2 = B, etc.
 
+    
     for(i=1;i< N;i++)
     {
         dist[i] = INF; //set all distances to infinite
         prev[i] = -1;
+
     }
 
     start = source; //the starting location of the code.

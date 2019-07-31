@@ -5,9 +5,11 @@ random.seed(5)
 def fill(size):
     return [[0 for i in range(size)] for i in range(size)]
 
-amount_of_vertices = 7
+amount_of_vertices = 5
 
-points = [(random.randint(1, amount_of_vertices), random.randint(1, amount_of_vertices)) for i in range(amount_of_vertices)]
+x = random.randint(1, amount_of_vertices)
+y = random.randint(1, amount_of_vertices)
+points = [((x, y),(y, x)) for i in range(amount_of_vertices)]
 
 matrix = fill(amount_of_vertices)
 
