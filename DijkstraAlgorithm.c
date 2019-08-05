@@ -4,7 +4,7 @@
 #include<math.h>
 
 #define INF 99
-#define N 5
+#define N 3
 int dijkstra(int cost[][N], int source, int target);
 int main(){
     int cost[N][N];
@@ -54,37 +54,25 @@ int main(){
         }
     }
 
-    for(int i = 0;i<5;i++){
-        for(int j = 0;j<5;j++){
+    for(int i = 0;i<N;i++){
+        for(int j = 0;j<N;j++){
             printf("%d ", cost[i][j]);
         }
         printf("\n");
     }
-    printf("Finished file reading");
-    fclose(input_file);
-    
-    // for(x=1;x<N;x++)
-    // {
-    //     for(y=x+1;y< N;y++)
-    //     {
-    //         printf("Enter the weight of the path between nodes %d and %d: ",x,y);
-    //         scanf("%d",&w);
-    //         if(w == 0) w = INF;
-    //         cost [x][y] = cost[y][x] = w;
-    //     }
-    //     printf("\n");
-    // }
-    
 
+    fclose(input_file);
+
+    printf("Enter Source node\n");
     scanf("%d", &source);
 
+    printf("Enter Target node\n");    
     scanf("%d", &target);
 
     co = dijsktra(cost,source-1,target-1);
 }
 int dijsktra(int cost[][N],int source,int target)
 {
-    printf("Reaches the top of the function");
     int dist[N] = {0}; //an array of distances between nodes
     int prev[N] = {0}; //the previous node's cost.
     int selected[N]={0}; //if a node is selected, and its adjacent edges are being checked. 
@@ -107,17 +95,25 @@ int dijsktra(int cost[][N],int source,int target)
     start = source; //the starting location of the code.
     selected[start]=1; //a boolean value stating that selected[i] is currently being looked it.
 
+    printf("\nParameters: source: %d, target: %d Start: %d, dist[start]: %d\n", source, target, start, dist[start]);
+
     dist[start] = 0; //the beginning distance 
+    printf("Reached main loop\n");
     while(selected[target] == 0)
     {
         min = INF; //set the minimum to infinity at first to guarentee the chance of the minimum occuring
         minIndex = 0; //the index of the minimum item, set that to be the first element regardless of what it will become
 
-        for(i=1;i< N;i++)
+        for(i=0;i < N;i++)
         {
+            printf("about to calculate the d\n");
             d = dist[start] + cost[start][i]; //add the first distance to the current adjacent node to the node with the current minimum index.
+            printf("d calculation is done\n");
+            printf("d < dist[i]: %d, selected[i]: %d\n", d < dist[i], selected[i]);
             if(d < dist[i] && selected[i] == 0) //if the distance "d" is less than the current distance, and this node has not yet been selected...
             {
+                printf("distance between %d and %d: %d\n", start, i, d);
+            
                 dist[i] = d; //set the current distance to the calculated distance
                 prev[i] = start; //set the previous element to the minimum index. 
             }
@@ -126,9 +122,15 @@ int dijsktra(int cost[][N],int source,int target)
                 min = dist[i]; //set the minimum to the current distance.
                 minIndex = i; //set the minimum index to the current index.
             }
+            // printf("min: %d\n", min);
+            // printf("minIndex: %d\n", minIndex);
+            
         }
         start = minIndex; //set the start to the minimum index.
+        printf("start: %d\n", start);
         selected[start] = 1; //set that particular node to "Selected"
+        printf("selected[start]: %d", selected[start]);
+        
     }
     start = target; //in the end, the "Start" variable will just be the target.
 
