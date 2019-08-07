@@ -1,5 +1,7 @@
 #include<stdio.h>
 
+#include <omp.h>
+
 #define INFINITY 9999
 #define MAX 10
  
@@ -10,12 +12,12 @@ int main()
     int graph[MAX][MAX]; //the graph, in the form of an adjacency matrix.
     int i;
     int j;
-    int amountOfNodes;
-    int startNode;
-    int targetNode;
+    int amountOfNodes = 4;
+    int startNode = 1;
+    int targetNode = 5;
     
-	printf("Enter no. of vertices:");
-    scanf("%d",&amountOfNodes);
+	// printf("Enter no. of vertices:");
+    // scanf("%d",&amountOfNodes);
     
 	// printf("\nEnter the adjacency matrix:\n");
 	
@@ -53,11 +55,11 @@ int main()
         printf("\n");
     }
 
-	printf("\nEnter the starting node:");
-    scanf("%d",&startNode);
+	// printf("\nEnter the starting node:");
+    // scanf("%d",&startNode);
 
-    printf("\nEnter the target node:");
-    scanf("%d",&targetNode);
+    // printf("\nEnter the target node:");
+    // scanf("%d",&targetNode);
 
     dijkstra(graph,amountOfNodes,startNode,targetNode);
 	
@@ -79,7 +81,7 @@ void dijkstra(int graph[MAX][MAX],int amountOfNodes,int startnode, int targetnod
 	
 	//pred[] stores the predecessor of each node
 	//count gives the number of nodes seen so far
-	//create the cost matrix
+    //create the cost matrix
 	for(i=0;i<amountOfNodes;i++){
 		for(j=0;j<amountOfNodes;j++){
             if(graph[i][j]==0){
@@ -109,26 +111,34 @@ void dijkstra(int graph[MAX][MAX],int amountOfNodes,int startnode, int targetnod
 	{
 		mindistance=INFINITY;
 		
-		//nextnode gives the node at minimum distance
-        for(i=0;i<amountOfNodes;i++)
-        
-			if(distance[i] < mindistance && visited[i] == 0) //if the distance is less than the current minimum distance and the node has not yet been visited
-			{
-				mindistance=distance[i];
-				nextnode=i; //next node is set to one of the surrounding nodes
-			}
-			
-			//check if a better path exists through nextnode			
-			visited[nextnode]=1; //visit the "next node"
-			for(i=0;i<amountOfNodes;i++)
-				if(visited[i] == 0) //if the node has not already been visited
-					if(mindistance+cost[nextnode][i] < distance[i]) //if the minimum distance + the cost is less than the current distance
-					{
-						distance[i]=mindistance+cost[nextnode][i]; //set the new distance to that number.
-						pred[i]=nextnode; //set the current path to the "next node"
-					}
+        //nextnode gives the node at minimum distance
+        #pragma omp parallel default(shared)
+        {
+            #pragma omp for reduction(min:mindistance) nowait schedule(dynamic)        
+            for(i=0;i<amountOfNodes;i++)
+            {
+                if(distance[i] < mindistance && visited[i] == 0) //if the distance is less than the current minimum distance and the node has not yet been visited
+                {
+                    mindistance=distance[i];
+                    nextnode=i; //next node is set to one of the surrounding nodes
+                }
+                
+                //check if a better path exists through nextnode			
+                visited[nextnode]=1; //visit the "next node"
+                for(i=0;i<amountOfNodes;i++){
+                    //if the node has not already been visited
+                    if(visited[i] == 0){
+                        if(mindistance+cost[nextnode][i] < distance[i]) //if the minimum distance + the cost is less than the current distance
+                        {
+                            distance[i]=mindistance+cost[nextnode][i]; //set the new distance to that number.
+                            pred[i]=nextnode; //set the current path to the "next node"
+                        }
+                    } 
+                }//end inner loop
+            }//end outer loop
+        }//end parallel section
 		count++;
-	}
+	}//end while loop
  
 	// print the path and distance between the target and source nodes.
     if(i!=startnode){
