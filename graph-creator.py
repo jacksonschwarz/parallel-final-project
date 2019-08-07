@@ -1,23 +1,15 @@
 import random
+import networkx as nx
 
-random.seed(5)
+import matplotlib.pyplot as plt 
 
-def fill(size):
-    return [[0 for i in range(size)] for i in range(size)]
-
-amount_of_vertices = 5
-
-x = random.randint(1, amount_of_vertices)
-y = random.randint(1, amount_of_vertices)
-points = [((x, y),(y, x)) for i in range(amount_of_vertices)]
-
-matrix = fill(amount_of_vertices)
-
-for point in points:
-    matrix[point[0]-1][point[1]-1] = 1
+g = nx.erdos_renyi_graph(1000, 0.5, 123)
 
 f = open("matrix.txt", "w")
 
-for row in matrix:
-    f.write(" ".join([str(c) for c in row]) + "\n")
+mat = nx.adjacency_matrix(g).todense().tolist()
+
+for row in mat:
+    f.write(" ".join([str(x) for x in row]) + "\n")
+
 
