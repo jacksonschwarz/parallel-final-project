@@ -2,8 +2,8 @@
 
 #include <omp.h>
 
-#define INFINITY 9999
-#define MAX 10
+#define INFINITY 999
+#define MAX 100
  
 void dijkstra(int G[MAX][MAX],int n,int startnode, int targetnode);
  
@@ -12,19 +12,10 @@ int main()
     int graph[MAX][MAX]; //the graph, in the form of an adjacency matrix.
     int i;
     int j;
-    int amountOfNodes = 4;
-    int startNode = 1;
-    int targetNode = 5;
-    
-	// printf("Enter no. of vertices:");
-    // scanf("%d",&amountOfNodes);
-    
-	// printf("\nEnter the adjacency matrix:\n");
-	
-	// for(i=0;i<n;i++)
-	// 	for(j=0;j<n;j++)
-	// 		scanf("%d",&G[i][j]);
-    
+    int amountOfNodes = 20;
+    int startNode = 0;
+    int targetNode = 17;
+
     int c;
     char *input = "matrix.txt";
     FILE *input_file;
@@ -33,7 +24,7 @@ int main()
 
     int rowcount = 0;
     int colcount = 0;
-    while ((c =fgetc(input_file)) != EOF )
+    while ((c = fgetc(input_file)) != EOF )
     {
         if (isdigit(c)){
             int digit = c-48;
@@ -55,92 +46,71 @@ int main()
         printf("\n");
     }
 
-	// printf("\nEnter the starting node:");
-    // scanf("%d",&startNode);
-
-    // printf("\nEnter the target node:");
-    // scanf("%d",&targetNode);
-
-    dijkstra(graph,amountOfNodes,startNode,targetNode);
+    #pragma omp barrier
+    dijkstra(graph,amountOfNodes,startNode, targetNode);
 	
 	return 0;
 }
  
-void dijkstra(int graph[MAX][MAX],int amountOfNodes,int startnode, int targetnode)
+void dijkstra(int G[MAX][MAX],int n,int startnode, int targetnode)
 {
  
-    int cost[MAX][MAX]; //the cost matrix, used to determine the minimum
-    int distance[MAX]; //the amount of distance between each node
-    int pred[MAX]; 
-    int visited[MAX]; //a boolean array that shows if the node has been examined. 
-    int count; //how many nodes have been visited in total
-    int mindistance;
-    int nextnode;
-    int i;
-    int j;
+	int cost[MAX][MAX],distance[MAX],pred[MAX];
+	int visited[MAX],count,mindistance,nextnode,i,j;
 	
 	//pred[] stores the predecessor of each node
 	//count gives the number of nodes seen so far
-    //create the cost matrix
-	for(i=0;i<amountOfNodes;i++){
-		for(j=0;j<amountOfNodes;j++){
-            if(graph[i][j]==0){
-                cost[i][j]=INFINITY; //if two nodes are not connected, then the distance is considered infinite               
-            }
-            else{
-                cost[i][j]=graph[i][j]; //otherwise, set it to be the actual weight of the graph.               
-            }
-        }
-
-    }
-
+	//create the cost matrix
+	for(i=0;i<n;i++)
+		for(j=0;j<n;j++)
+			if(G[i][j]==0)
+				cost[i][j]=INFINITY;
+			else
+				cost[i][j]=G[i][j];
 	
-	for(i=0;i<amountOfNodes;i++)
+	//initialize pred[],distance[] and visited[]
+	for(i=0;i<n;i++)
 	{
-		distance[i]=cost[startnode][i];//set the distance to be the cost initially.
-		pred[i]=startnode; 
-		visited[i]=0; //no nodes have been visited, so set all of the "visited" nodes to 0
+		distance[i]=cost[startnode][i];
+		pred[i]=startnode;
+		visited[i]=0;
 	}
 	
-	distance[startnode]=0; //set the distance of the starting node to 0
-	visited[startnode]=1;  //selected the starting node
-	count=1; 
-    
-    
-	while(count<amountOfNodes-1) //iterate through each element in the graph
+	distance[startnode]=0;
+	visited[startnode]=1;
+	count=1;
+	
+	while(count<n-1)
 	{
 		mindistance=INFINITY;
 		
         //nextnode gives the node at minimum distance
         #pragma omp parallel default(shared)
         {
-            #pragma omp for reduction(min:mindistance) nowait schedule(dynamic)        
-            for(i=0;i<amountOfNodes;i++)
-            {
-                if(distance[i] < mindistance && visited[i] == 0) //if the distance is less than the current minimum distance and the node has not yet been visited
+            #pragma omp for reduction(min:mindistance) nowait schedule(dynamic)
+            for(i=0;i<n;i++)
+                if(distance[i]<mindistance&&!visited[i])
                 {
                     mindistance=distance[i];
-                    nextnode=i; //next node is set to one of the surrounding nodes
+                    nextnode=i;
                 }
                 
                 //check if a better path exists through nextnode			
-                visited[nextnode]=1; //visit the "next node"
-                for(i=0;i<amountOfNodes;i++){
-                    //if the node has not already been visited
-                    if(visited[i] == 0){
-                        if(mindistance+cost[nextnode][i] < distance[i]) //if the minimum distance + the cost is less than the current distance
+                visited[nextnode]=1;
+                for(i=0;i<n;i++)
+                    if(!visited[i])
+                        if(mindistance+cost[nextnode][i]<distance[i])
                         {
-                            distance[i]=mindistance+cost[nextnode][i]; //set the new distance to that number.
-                            pred[i]=nextnode; //set the current path to the "next node"
+                            distance[i]=mindistance+cost[nextnode][i];
+                            pred[i]=nextnode;
                         }
-                    } 
-                }//end inner loop
-            }//end outer loop
-        }//end parallel section
+        }
+		
 		count++;
-	}//end while loop
+	}
  
-	// print the path and distance between the target and source nodes.
+    //print the path and distance of each node
+    count = 0;
     if(i!=startnode){
         printf("\nDistance of node%d=%d",targetnode,distance[targetnode]);
         printf("\nPath=%d",targetnode);
@@ -149,8 +119,13 @@ void dijkstra(int graph[MAX][MAX],int amountOfNodes,int startnode, int targetnod
         do{
             j=pred[j];
             printf("<-%d",j);
+            count++;
+            count ++;
+            if(count > n){
+                printf("<-INF LOOP\n");
+                break;
+            }
         }while(j!=startnode);
     }
-    printf("\n");
-    
 }
+    
