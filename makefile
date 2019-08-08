@@ -23,4 +23,4 @@ $(PROGC): $(OBJSC)
 
 #clean rule
 clean:
-	$(RM) -rf *.o $(PROGC) *.mod *.o*
+	$(RM) -rf *.o $(PROGC) *.mod *.o* 

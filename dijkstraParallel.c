@@ -2,8 +2,13 @@
 
 #include <omp.h>
 
+
+//IF YOU'RE CHANGING THE AMOUNT OF NODES..
+//SET THE MAX > the amounts of nodes
+//set the amountOfNodes variable equal to the square size of the matrix. 
+
 #define INFINITY 999
-#define MAX 100
+#define MAX 1000
  
 void dijkstra(int G[MAX][MAX],int n,int startnode, int targetnode);
  
@@ -12,9 +17,9 @@ int main()
     int graph[MAX][MAX]; //the graph, in the form of an adjacency matrix.
     int i;
     int j;
-    int amountOfNodes = 20;
+    int amountOfNodes = 750;
     int startNode = 0;
-    int targetNode = 17;
+    int targetNode = 170;
 
     int c;
     char *input = "matrix.txt";
@@ -39,14 +44,14 @@ int main()
         }
     }
 
-    for(int i = 0;i<amountOfNodes;i++){
-        for(int j = 0;j<amountOfNodes;j++){
-            printf("%d ", graph[i][j]);
-        }
-        printf("\n");
-    }
+    // for(int i = 0;i<amountOfNodes;i++){
+    //     for(int j = 0;j<amountOfNodes;j++){
+    //         printf("%d ", graph[i][j]);
+    //     }
+    //     printf("\n");
+    // }
 
-    #pragma omp barrier
+    // #pragma omp barrier
     dijkstra(graph,amountOfNodes,startNode, targetNode);
 	
 	return 0;
